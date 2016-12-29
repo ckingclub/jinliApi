@@ -33,5 +33,4 @@ return array(
     'DeepCopy\\' => array($vendorDir . '/myclabs/deep-copy/src/DeepCopy'),
     'Codeception\\Extension\\' => array($vendorDir . '/codeception/base/ext'),
     'Codeception\\' => array($vendorDir . '/codeception/base/src/Codeception'),
-	'QCloud_WeApp_SDK\\' => array($vendorDir . '/qcloud/weapp-sdk/lib'),
 );
