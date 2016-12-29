@@ -24,7 +24,7 @@ class User extends ActiveRecord {
 	public function rules()
 	{
 		return [
-			[['gender','created_at'], 'integer'],
+			[['gender','updated_at','created_at'], 'integer'],
 			[['openId', 'nickName', 'country', 'province', 'city', 'avatarUrl', 'language'], 'string']
 		];
 	}
@@ -36,7 +36,7 @@ class User extends ActiveRecord {
 						'class' => TimestampBehavior::className (),
 						'attributes' => [ 
 								ActiveRecord::EVENT_BEFORE_VALIDATE => [ 
-										'created_at' 
+										'updated_at'
 								] 
 						] 
 				] 
@@ -48,6 +48,7 @@ class User extends ActiveRecord {
 		$user = static::find()->where(['openId'=>$openId])->one();
 		if( $user == null){
 			$user = new User();
+			$user->created_at = time();
 		}
 		$user->attributes = $data;
 		$user->save();
