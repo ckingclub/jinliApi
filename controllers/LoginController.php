@@ -11,11 +11,7 @@ class LoginController extends Controller {
 		QcloudInit::Conf ();
 		$result = LoginService::login ();
 		if ($result ['code'] == 0) {
-			$user = new User();
-			\Yii::info($result['data'],'test2');
-			$user->attributes = $result['data']['userInfo'];
-			\Yii::info(json_encode($user),'test3');
-			$user->save();
+			User::addOrUpdateUser($result['data']['userInfo']['openId'],$result['data']['userInfo']);
 		}
     }
 }

@@ -42,4 +42,14 @@ class User extends ActiveRecord {
 				] 
 		];
 	}
+	
+	public static function addOrUpdateUser($openId,$data)
+	{
+		$user = static::find()->where(['openId'=>$openId])->one();
+		if( $user == null){
+			$user = new User();
+		}
+		$user->attributes = $data;
+		$user->save();
+	}
 }
