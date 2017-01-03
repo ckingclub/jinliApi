@@ -83,15 +83,17 @@ class ApiController extends Controller{
 	 */
 	private function readParamFromPost(){
 		$requests = file_get_contents ( 'php://input' );
-		$reqData = json_decode ( $requests, true );
-		 
-		/**
-		 * 检查数据格式
-		 */
-		if (json_last_error ()) {
-			throw new Exception ( 'data error', 20001 );
+		if(!empty($requests)){
+			$reqData = json_decode ( $requests, true );
+			/**
+		 	* 检查数据格式
+		 	*/
+			if (json_last_error ()) {
+				throw new Exception ( 'data error', 20001 );
+			}
+			return $reqData;
 		}
-		return $reqData;
+		return [];
 	}
 	
 	/**
