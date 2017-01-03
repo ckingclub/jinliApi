@@ -4,7 +4,7 @@ namespace app\controllers;
 use \QCloud_WeApp_SDK\Auth\LoginService;
 use yii\base\Controller;
 
-class UserController extends Controller {
+class UserController extends ApiController {
     public function actionIndex() {
         $result = LoginService::check();
 

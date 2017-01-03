@@ -2,11 +2,10 @@
 namespace app\controllers;
 
 use \QCloud_WeApp_SDK\Auth\LoginService;
-use yii\base\Controller;
 use app\service\QcloudInit;
 use app\models\User;
 
-class LoginController extends Controller {
+class LoginController extends ApiController {
 	public function actionIndex() {
 		QcloudInit::Conf ();
 		$result = LoginService::login ();

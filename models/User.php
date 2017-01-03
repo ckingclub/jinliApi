@@ -8,19 +8,6 @@ class User extends ActiveRecord {
 	/**
 	 * @inheritdoc
 	 */
-// 	public  $openId;
-// 	public  $nickName;
-// 	public  $country;
-// 	public  $province;
-// 	public  $city;
-// 	public  $avatarUrl;
-// 	public  $gender;
-// 	public  $language;
-// 	public  $created_at;
-	
-	/**
-	 * @inheritdoc
-	 */
 	public function rules()
 	{
 		return [
@@ -49,6 +36,9 @@ class User extends ActiveRecord {
 		if( $user == null){
 			$user = new User();
 			$user->created_at = time();
+			$user->loginCount = 1;
+		} else {
+			$user->loginCount++;
 		}
 		$user->attributes = $data;
 		$user->save();

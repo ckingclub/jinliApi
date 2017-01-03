@@ -7,7 +7,6 @@ $config = [
 		'bootstrap' => [ 
 				'log' 
 		],
-		'defaultRoute' => '/welcome/index',
 		'components' => [ 
 				'request' => [ 
 						// !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
@@ -17,9 +16,6 @@ $config = [
 				],
 				'cache' => [ 
 						'class' => 'yii\caching\FileCache' 
-				],
-				'errorHandler' => [ 
-						'errorAction' => 'site/error' 
 				],
 				'mailer' => [ 
 						'class' => 'yii\swiftmailer\Mailer',
@@ -58,13 +54,7 @@ $config = [
 										'maxFileSize' => 2048576,
 										'maxLogFiles' => 20,
 										'categories' => [ 
-												'debug',
-												'test1',
-												'test2',
-												'test3',
-												'test4',
-												'test5',
-												'test6',
+												'test'
 										],
 										'logFile' => '@app/runtime/logs/dataLog.log.' . date ( 'Ymd' ),
 										'logVars' => [ ] 
