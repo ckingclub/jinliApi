@@ -8,6 +8,7 @@ use yii\base\Exception;
 class ApiController extends Controller{
 	private $getParams;
 	private $responseBool = false;
+
 	/**
 	 * 重写runAction方法以处理post参数
 	 */
@@ -112,8 +113,16 @@ class ApiController extends Controller{
 	public function afterAction($action, $result){
 		if($this->responseBool){
 			$result = parent::afterAction($action, $result);
-			return json_encode($result);
+			$json = json_encode($result);
+			return preg_replace("#\\\u([0-9a-f]+)#ie","iconv('UCS-2BE','UTF-8', pack('H4', '\\1'))",$json);//处理中文
 		}
 		return parent::afterAction($action, $result);
+	}
+	
+	/**
+	 * 读取语言包，每次都将语言包读入类的属性，故在这里动态调用
+	 */
+	public function getMessage( $code ){
+		return Yii::$app->params['message'][$code];
 	}
 }
