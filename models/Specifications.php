@@ -44,4 +44,15 @@ class Specifications extends ActiveRecord {
 		}
 		return $specifications; 
 	}
+	
+	/**
+	 * 通过goodsId与specifications检查specifications是否存在
+	 */
+	public static function findPiceOfSpecifications($goodsId,$specifications){
+		$price = static::find()->select(['price'])->where(['goodsId'=>$goodsId,'specifications'=>$specifications,'status'=>0])->asArray()->one();
+		if(empty($price)){
+			return [];
+		}
+		return $price;
+	}
 }

@@ -4,7 +4,9 @@ namespace app\models;
 
 use yii\db\ActiveRecord;
 use yii\behaviors\TimestampBehavior;
-class Shop extends ActiveRecord {
+class ShoppingCart extends ActiveRecord {
+	const STATUS_NORMAL = 0;
+	const STATUS_HAS_TO_ORDER = 1;
 	/**
 	 * @inheritdoc
 	 */
@@ -30,4 +32,36 @@ class Shop extends ActiveRecord {
 				] 
 		];
 	}
+	/**
+	 * 通过openId获取购物车列表
+	 */
+	public static function getShoppingCartList($openId){
+		$shoppingCartList = static::find()->select(['goodsId','specifications','num','name','price'])->where(['openId'=>$openId,'status'=>STATUS_NORMAL])->Where(['and','num>0'])->asArray()->all();
+		if(empty($shoppingCartList)){
+			return [];
+		}
+		return $shoppingCartList; 
+	}
+	
+	/**
+	 * 通过openId,goddsId找到购物车中
+	 */
+	public static function getShoppingCartItem($openId,$goodsId){
+		$item = static::find()->where(['openId'=>$openId,'goodsId'=>$goodsId,'status'=>STATUS_NORMAL])->one();
+		if($item === null){
+			return [];
+		}
+		return $item;
+    }
+    
+    /**
+     * 通过orderId获取购物车列表，无论状态
+     */
+    public static function getListByOrderId($orderId){
+    	$list = static::find()->where(['orderId'=>$orderId])->asArray()->all();
+    	if(empty($list)){
+    		return [];
+    	}
+    	return $list;
+    }
 }

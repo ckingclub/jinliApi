@@ -43,4 +43,13 @@ class User extends ActiveRecord {
 		$user->attributes = $data;
 		$user->save();
 	}
+	
+	/**
+	 * 检查用户是否存在
+	 */
+	public static function checkUserIn($openId){
+		$user = static::find()->where(['openId'=>$openId])->one();
+		$existBool = !($user === null);
+		return $existBool;
+	}
 }
