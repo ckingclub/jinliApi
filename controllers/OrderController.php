@@ -28,6 +28,12 @@ class OrderController extends ApiController {
 					'message' => $this->getMessage ( 20001 ) 
 			];
 		}
+		if (empty ( $orderDetatil )) {
+			return [ 
+					'code' => 20018,
+					'message' => $this->getMessage ( 20018 ) 
+			];
+		}
 		// 检查orderDetail
 		foreach ( $orderDetatil as $orderItem ) {
 			try {
@@ -48,14 +54,14 @@ class OrderController extends ApiController {
 					];
 				}
 				// 检查number是否合法
-				if ($orderItem ['number'] <= 0) {
+				if ($orderItem ['num'] <= 0) {
 					return [ 
 							'code' => 20011,
 							'message' => $this->getMessage ( 20011 ) 
 					];
 				}
 				// 检查price是否正确
-				if ($specifications ['pric'] * $orderItem ['num'] != $orderItem ['price']) {
+				if ($specifications ['price'] * $orderItem ['num'] != $orderItem ['price']) {
 					return [ 
 							'code' => 20010,
 							'message' => $this->getMessage ( 20010 ) 
@@ -64,7 +70,8 @@ class OrderController extends ApiController {
 			} catch ( \Exception $e ) {
 				return [ 
 						'code' => 20012,
-						'message' => $this->getMessage ( 20012 ) 
+						'message' => $this->getMessage ( 20012 ),
+						'error' => $e->getMessage () 
 				];
 			}
 		}
@@ -73,16 +80,16 @@ class OrderController extends ApiController {
 		 * 业务逻辑部分
 		 */
 		// 函数内部使用函数闭包
-		$addShoppingCart = function ($orderItem, $orderSn, $name) {
+		$addShoppingCart = function ($openId, $orderItem, $orderSn, $name) {
 			$shoppingCart = new ShoppingCart ();
 			$shoppingCart->goodsId = $orderItem ['goodsId'];
 			$shoppingCart->openId = $openId;
 			$shoppingCart->specifications = $orderItem ['specifications'];
 			$shoppingCart->price = $orderItem ['price'];
 			$shoppingCart->status = ShoppingCart::STATUS_HAS_TO_ORDER;
-			$shoppingCart->num = $orderItem ['number'];
+			$shoppingCart->num = $orderItem ['num'];
 			$shoppingCart->name = $name;
-			$addShoppingCart->orderId = $orderSn;
+			$shoppingCart->orderId = $orderSn;
 			$shoppingCart->created_at = time ();
 			return $shoppingCart->save ();
 		};
@@ -102,7 +109,7 @@ class OrderController extends ApiController {
 			foreach ( $orderDetatil as $orderItem ) {
 				$goods = Shop::getGoodsInfoByGoodsId ( $orderItem ['goodsId'] );
 				// 生成购物车信息
-				$saveBool = $saveBool || $addShoppingCart ( $orderItem, $orderSn, $goods ['name'] );
+				$saveBool = ($saveBool && $addShoppingCart ( $openId, $orderItem, $orderSn, $goods ['name'] ));
 				$priceAll += $orderItem ['price'];
 			}
 		} else { // 如果是从物车过来的订单
@@ -111,12 +118,13 @@ class OrderController extends ApiController {
 				$shoppingCart = ShoppingCart::getShoppingCartItem ( $openId, $orderItem ['goodsId'] );
 				if (empty ( $shoppingCart )) {
 					$goods = Shop::getGoodsInfoByGoodsId ( $orderItem ['goodsId'] );
-					$saveBool = $addShoppingCart ( $orderItem, $orderSn, $goods ['name'] );
+					$saveBool = $addShoppingCart ( $openId, $orderItem, $orderSn, $goods ['name'] );
+				} else {
+					$shoppingCart->orderId = $orderSn;
+					$shoppingCart->status = ShoppingCart::STATUS_HAS_TO_ORDER;
+					$saveBool = $shoppingCart->save ();
+					$priceAll += $orderItem ['price'];
 				}
-				$shoppingCart->orderId = $orderSn;
-				$shoppingCart->status = ShoppingCart::STATUS_HAS_TO_ORDER;
-				$saveBool = $saveBool || $addShoppingCart ( $orderItem, $orderSn, $goods ['name'] );
-				$priceAll += $orderItem ['price'];
 			}
 		}
 		if (! $saveBool) {
@@ -166,7 +174,7 @@ class OrderController extends ApiController {
 					'message' => $this->getMessage ( 20014 ) 
 			];
 		}
-		if ($order->staus !== Order::STATUS_NORMAL) {
+		if ($order->status !== Order::STATUS_NORMAL) {
 			return [ 
 					'code' => 20015,
 					'message' => $this->getMessage ( 20015 ) 
@@ -313,7 +321,7 @@ class OrderController extends ApiController {
 			$shoppingCart->goodsId = $goodsId;
 			$shoppingCart->openId = $openId;
 			$shoppingCart->specifications = $specifications;
-			$shoppingCart->price = $specificationsPrice * $num;
+			$shoppingCart->price = ($specificationsPrice ['price'] * $num);
 			$shoppingCart->status = 0;
 			$shoppingCart->num = $num;
 			$shoppingCart->name = $goods ['name'];
@@ -384,14 +392,14 @@ class OrderController extends ApiController {
 		}
 		// 检查goodsId是否存在
 		$goodsBool = Shop::checkGoods ( $goodsId );
-		if (! goodsBool) {
+		if (! $goodsBool) {
 			return [ 
 					'code' => 20002,
 					'message' => $this->getMessage ( 20002 ) 
 			];
 		}
 		// 增、删
-		$shoppingCart = ShoppingCart::getShoppingCartItem ( $openId ,$goodsId);
+		$shoppingCart = ShoppingCart::getShoppingCartItem ( $openId, $goodsId );
 		if (empty ( $shoppingCart )) {
 			return [ 
 					"code" => 20007,
@@ -402,9 +410,17 @@ class OrderController extends ApiController {
 		if ($shoppingCart->num < 0) {
 			return [ 
 					"code" => 20008,
-					"message" => $this->getMessage () 
+					"message" => $this->getMessage ( 20008 ) 
 			];
 		}
+		$specificationsPrice = Specifications::findPiceOfSpecifications ( $goodsId, $shoppingCart->specifications );
+		if (empty ( $specificationsPrice )) {
+			return [ 
+					'code' => 20003,
+					'message' => $this->getMessage ( 20003 ) 
+			];
+		}
+		$shoppingCart->price = $specificationsPrice ['price'] * $shoppingCart->num;
 		$saveBool = $shoppingCart->save ();
 		if($saveBool){
 			return [

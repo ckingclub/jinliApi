@@ -35,7 +35,7 @@ class Order extends ActiveRecord {
 	}
 	
 	public static function createOrderSn($openId){
-		$orderSn = 'JLOR'.date('YMD').substr($openId, -4);
+		$orderSn = 'JLOR'.date('Ymd').substr($openId, -4);
 		$random = rand(1000, 10000);
 		while(true){
 			$order = static::find()->where(['orderId'=>$orderSn.$random])->one();

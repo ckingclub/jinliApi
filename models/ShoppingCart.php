@@ -36,7 +36,7 @@ class ShoppingCart extends ActiveRecord {
 	 * 通过openId获取购物车列表
 	 */
 	public static function getShoppingCartList($openId){
-		$shoppingCartList = static::find()->select(['goodsId','specifications','num','name','price'])->where(['openId'=>$openId,'status'=>STATUS_NORMAL])->Where(['and','num>0'])->asArray()->all();
+		$shoppingCartList = static::find()->select(['goodsId','specifications','num','name','price'])->where(['openId'=>$openId,'status'=>self::STATUS_NORMAL])->Where(['and','num>0'])->asArray()->all();
 		if(empty($shoppingCartList)){
 			return [];
 		}
@@ -47,7 +47,7 @@ class ShoppingCart extends ActiveRecord {
 	 * 通过openId,goddsId找到购物车中
 	 */
 	public static function getShoppingCartItem($openId,$goodsId){
-		$item = static::find()->where(['openId'=>$openId,'goodsId'=>$goodsId,'status'=>STATUS_NORMAL])->one();
+		$item = static::find()->where(['openId'=>$openId,'goodsId'=>$goodsId,'status'=>self::STATUS_NORMAL])->one();
 		if($item === null){
 			return [];
 		}

@@ -91,7 +91,7 @@ class Shop extends ActiveRecord {
 	 * 检查商品是否存在
 	 */
 	public static function checkGoods($goodsId){
-		$goods = static::find()->where(['goodsId'=>$goodsId,'delete'=>0])->one();
+		$goods = static::find()->where(['goodsId'=>$goodsId,'deleted'=>0])->one();
 		$existBool = !($goods === null);
 		return $existBool;
 	}

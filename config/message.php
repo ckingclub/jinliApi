@@ -23,5 +23,6 @@ return [
 		20014 => 'this order not found in server',
 		20015 => 'this order\'s status is not normal',
 		20016 => 'unknown error occured, when cancle order',
-		20017 => 'unknown error occured, when save shoppingcart info befor saving order' 
+		20017 => 'unknown error occured, when save shoppingcart info befor saving order',
+		20018 => 'order detail can not be empty!'
 ];
